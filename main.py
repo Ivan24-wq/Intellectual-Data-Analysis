@@ -1,54 +1,46 @@
-import math
-#Класс для работы с дробью
-class Frac:
-    def __init__(self, numerator, denominator):
-        if denominator == 0:
-            raise ValueError("Знаменатель не может равняться нулю!")
-        
-        self.numerator = numerator
-        self.denominator = denominator
-        self._reduce()
-    
-    #Сокращение дробей
-    def _reduce(self):
-        g = math.gcd(self.numerator, self.denominator)
-        self.numerator //= g
-        self.denominator //= g
-        if self.denominator < 0:
-            self.numerator = -self.numerator
-            self.denominator = -self.denominator
-    #вывод в виде дроби
-    def __str__(self):
-        if self.denominator == 1:
-            return str(self.numerator)
-        return f"{self.numerator}/{self.denominator}"
-    
-    #Функция для возврата обратной дроби
-    def inverse(self):
-        if self.numerator == 0:
-            raise ZeroDivisionError("Нельзя обратить нулевую дробь!")
-        return Frac(self.denominator, self.numerator)
-    
-    #Словжение дробей
-    def __add__(self, other):
-        if not isinstance(other, Frac):
-            other = Frac(other)
-        new_numerator = self.numerator * other.denominator + self.denominator * other.numerator
-        new_denominator = self.denominator * other.denominator
-        return Frac(new_numerator, new_denominator)
-    #Умножение дробей
-    def __mul__(self, other):
-        if not isinstance(other, Frac):
-            other = Frac(other)
-        new_numerator = self.numerator * other.numerator
-        new_denominator = self.denominator * other.denominator
-        return Frac(new_numerator, new_denominator)
-    
+import pandas as pd
+import matplotlib.pyplot as plt
 
-a = Frac(2, 3)
-b = Frac(3, 4)
-print("a = ", a)
-print("b = ", b)
-print("a + b = ", a + b)
-print("a * b = ", a * b)
-print("inverse(a) = ", a.inverse())
+def main(file):
+    #Загрузка данных
+    df = pd.read_csv(file, header=None, names=['date', 'temperature'], encoding='cp1251', sep=';', usecols=[0, 1])
+    
+    #Обработка температур
+    df['temperature'] = pd.to_numeric(df['temperature'], errors='coerce')#Преобразуем в числа если можем
+    df = df.dropna(subset=['temperature']) #Удаляем всё что не преобразовалось(мусор если он есть)
+    
+    #Обработка дат
+    df['date'] = pd.to_datetime(df['date'], format='%d.%m.%Y %H:%M', errors='coerce')#Преобразуем числа в дату
+    df = df.dropna(subset=['date']) #Удаляем всё что не преобразовалось(мусор если он есть)
+    
+    #Среднесуточные температуры
+    df['date_only'] = df['date'].dt.date # Добавляем колонку дата БЕЗ ВРЕМЕНИ(в таблице есть несколько замеров в один день но в разное время)
+    daily_avg = df.groupby('date_only')['temperature'].mean().reset_index() #Считаем средние температуры в день
+    
+    
+    #Добавляем месяц
+    daily_avg['month'] = pd.to_datetime(daily_avg['date_only']).dt.month #Добовляем колонку месяц 1-12
+    
+    #Стандартное отклонение по месяцам
+    monthly_std = daily_avg.groupby('month')['temperature'].std().reset_index()#Стандартное отклонение по месяцам
+    monthly_std.columns = ['month', 'std_deviation'] #Для удобства оставляем только колонку месяц и отколонение
+    
+    return monthly_std
+
+msk = main(r'F:\ИАД\Intellectual-Data-Analysis\moskov.csv')
+anadyr = main(r'F:\ИАД\Intellectual-Data-Analysis\anadyr.csv')
+
+#Построение графика
+plt.figure(figsize=(12, 6))
+plt.plot(msk['month'], msk['std_deviation'], marker='o', label='Москва', linewidth=2, markersize=8)
+plt.plot(anadyr['month'], anadyr['std_deviation'], marker='s', label='Анадырь', linewidth=2, markersize=8)
+
+#Настройки графика
+plt.title('Стандартное отклонение температур по месяцам', fontsize=14)
+plt.xlabel('Месяц', fontsize=12)
+plt.ylabel('Стандартное отклонение (°C)', fontsize=12)
+plt.xticks(range(1, 13), ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'])
+plt.grid(True, alpha=0.3)
+plt.legend(fontsize=12)
+plt.tight_layout()
+plt.show()
