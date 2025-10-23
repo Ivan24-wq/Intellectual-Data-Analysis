@@ -83,8 +83,8 @@ params_batch = init + 0.01 * rng.standard_normal(7)
 params_sgd = init + 0.01 * rng.standard_normal(7)
 
 #Скорости обучения
-lr_coeff_batch = 5e-3
-lr_om_batch = 5e-6
+lr_coeff_batch = 5e-4
+lr_om_batch = 5e-4
 max_iters_batch = 4000
 
 lr_coeff_sgd = 2e-3
