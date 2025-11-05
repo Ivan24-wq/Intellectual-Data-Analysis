@@ -13,7 +13,7 @@ print(df.head(), "\n")
 
 
 #Список экзаменов
-exam_cols = ['math score', 'reading score', 'writing store']
+exam_cols = ['math score', 'reading score', 'writing score']
 X = df.drop(columns = exam_cols).values
 
 #Выборка в пропорции 70/30
@@ -31,6 +31,7 @@ def train_test(X, y, test_ratio = 0.3, seed = 42):
 def linear_regresion(X, y):
     X_b = np.c_[np.ones((X.shape[0], 1)), X]
     beta = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y
+    return beta
 
 def predict(X, beta):
     X_b = np.c_[np.ones((X.shape[0], 1)), X]
@@ -58,7 +59,8 @@ for exam in exam_cols:
 res_2 = {}
 y = df['math score'].values
 X_train, X_test, y_train, y_test = train_test(X, y)
-beta_math = linear_regresion(X_test, beta_math)
+beta_math = linear_regresion(X_train, y_train)
+y_pred_math = predict(X_test, beta_math)
 res_2['math score'] = r2_score(y_test, y_pred_math)
 
 
@@ -76,3 +78,11 @@ X_train, X_test, y_train, y_test = train_test(X_write, y)
 beta_write = linear_regresion(X_train, y_train)
 y_pred_write = predict(X_test, beta_write)
 res_2['writing score'] = r2_score(y_test, y_pred_write)
+
+print("\n Квадрат результатов предположения 1")
+for exam, r2 in res_1.items():
+    print(f"{exam}: {r2:3f}")
+    
+print("\n Квадрат результатов предположения 2")
+for exam, r2 in res_2.items():
+    print(f"{exam}: {r2:3f}")
