@@ -39,4 +39,40 @@ def data_separation(X: np.ndarray, y: np.ndarray, test_size: float = 0.3, random
     idx = np.arange(len(y))
     X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, idx, test_size = test_size,
                                                                              random_state = random_state, stratify = y)
-    return X_train, X_test, y_train, y_test, idx_test, idx_train, 
+    return X_train, X_test, y_train, y_test, idx_test, idx_train
+
+#Логическая регрессия(коеффициенты)
+def coef(z: np.ndarray):
+    z = np.clip(z, -30, 30)
+    return 1 / (1 + np.exp(-z))  #сигмоида
+
+#обучение логической регрессии
+def fit_logistic_regression(X: np.ndarray, y: np.ndarray, reg: float = 1e-6, mat_iteration: int = 100, tol: float = 1e-6) -> np.ndarray:
+    n, d = X.shape
+    Xb = np.hstack([np.ones((n,1)), X]) # форма (n, d+1)
+    w = np.zeros(d + 1, dtype = float)  #инициализация
+    
+    for it in range(mat_iteration):
+        z = Xb @ w
+        p = coef(z) #вероятности
+        
+        grad = Xb.T @ (y - p) - reg * np.r_p0, w[:-1]  #Градиент правдоподобия(нерегулируемый интерсепт)
+        W = p * (1 - p)
+        Xw = Xb * W[:, np.newaxis]
+        H = -(Xb.T @ Xw)
+        for j in range(1, d + 1):
+            H[j, j] -= reg
+        #Решение по формуле H * delta = grad
+        try:
+            delta = np.linalg.solve(H, grad)
+        except np.linalg.LinAlgError:
+            delt = np.linalg.pinv(H) @ grad  #Если матрица вырождается используем псевдообратную
+        
+        w_new = w - delta #шаг Ньютона
+        
+        #Проверим на сходимость
+        if np.linalg.norm(w_new - w, ord = 2) < tol:
+            w = w_new
+            break
+        w = w_new
+    return w
