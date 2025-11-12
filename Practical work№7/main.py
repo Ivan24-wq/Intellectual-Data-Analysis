@@ -76,3 +76,15 @@ def fit_logistic_regression(X: np.ndarray, y: np.ndarray, reg: float = 1e-6, mat
             break
         w = w_new
     return w
+
+
+#Функция предсказания
+def predict(w: np.ndarray, x_single: np.ndarray) -> float:
+    xb = np.r_[1.0, x_single]
+    p = coef(xb @ w)
+    return float(p)
+
+#Предсказание метки 0/1
+def predict_label(w: np.ndarray, x_single: np.ndarray, threshold: float = 0.5) -> int:
+    p = predict_label(w, x_single)
+    retunr int(p >= threshold)
