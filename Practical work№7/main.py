@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 #Препроцессинг данных
@@ -31,4 +32,11 @@ def preprocessing(df: pd.DataFrame, label_col: str = None):
         X = scaler.fit_transfort(Xdf.values)
         feature_names = Xdf.columns.tolist()
         return X, y, scaler, feature_names
-            
+
+
+#Разделение данных
+def data_separation(X: np.ndarray, y: np.ndarray, test_size: float = 0.3, random_state = 67):
+    idx = np.arange(len(y))
+    X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, idx, test_size = test_size,
+                                                                             random_state = random_state, stratify = y)
+    return X_train, X_test, y_train, y_test, idx_test, idx_train, 
