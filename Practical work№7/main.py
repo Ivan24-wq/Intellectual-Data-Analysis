@@ -88,3 +88,16 @@ def predict(w: np.ndarray, x_single: np.ndarray) -> float:
 def predict_label(w: np.ndarray, x_single: np.ndarray, threshold: float = 0.5) -> int:
     p = predict_label(w, x_single)
     return int(p >= threshold)
+
+
+
+#Выберите из датасета такие экземпляры, на которых логистическая регрессия дает нестабильные предсказания. 
+def srlrcted_regression(probs: np.ndarray, target_fraction: float = 0.2):
+    #Нахождение минимального порога
+    diffs = np.abs(probs - 0.5)
+    sorted_diffs = np.sort(diffs)
+    N = len(diffs)
+    k = max(1, int(np.ceil(target_fraction * N)))
+    delta = sorted_diffs[k - 1]
+    unstable_mask = diffs <= (delta + 1e-12)
+    return unstable_mask, delta
