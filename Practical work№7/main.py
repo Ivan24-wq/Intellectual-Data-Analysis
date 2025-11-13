@@ -105,7 +105,7 @@ def srlrcted_regression(probs: np.ndarray, target_fraction: float = 0.2):
 
 
 #Построение классификации(метод ближайших соседей)
-def classification(X_train: np.ndarray, y_train: np.ndarray, k% int = 5) -> KNeighborsClassifier:
+def classification(X_train: np.ndarray, y_train: np.ndarray, k: int = 5) -> KNeighborsClassifier:
     #Обучает ИИ
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_train, y_train)
