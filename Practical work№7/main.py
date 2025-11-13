@@ -87,4 +87,4 @@ def predict(w: np.ndarray, x_single: np.ndarray) -> float:
 #Предсказание метки 0/1
 def predict_label(w: np.ndarray, x_single: np.ndarray, threshold: float = 0.5) -> int:
     p = predict_label(w, x_single)
-    retunr int(p >= threshold)
+    return int(p >= threshold)
