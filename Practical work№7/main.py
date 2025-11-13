@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from typing import Tuple 
 
 
 #Препроцессинг данных
@@ -110,3 +112,13 @@ def classification(X_train: np.ndarray, y_train: np.ndarray, k: int = 5) -> KNei
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_train, y_train)
     return knn
+
+#Метрики качества
+def metric(y_true: np.ndarray, y_pred: np.ndarray):
+    precision = precision_score(y_true, y_pred, zero_division = 0)
+    recall = recall_score(y_true, y_pred, zero_division = 0)
+    f1 = f1_score(y_true, y_pred, zero_division = 0)
+    return precision, recall, f1
+
+def compute(y_true_ter: np.ndarray, y_pred_ter: np.ndarray):
+    return accuracy_score(y_true_ter, y_pred_ter)
