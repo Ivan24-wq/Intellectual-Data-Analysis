@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
 
 #Препроцессинг данных
@@ -101,3 +102,11 @@ def srlrcted_regression(probs: np.ndarray, target_fraction: float = 0.2):
     delta = sorted_diffs[k - 1]
     unstable_mask = diffs <= (delta + 1e-12)
     return unstable_mask, delta
+
+
+#Построение классификации(метод ближайших соседей)
+def classification(X_train: np.ndarray, y_train: np.ndarray, k% int = 5) -> KNeighborsClassifier:
+    #Обучает ИИ
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    return knn
